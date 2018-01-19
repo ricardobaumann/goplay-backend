@@ -16,8 +16,25 @@ type QueryResult struct {
 	Parameters map[string]string `json:"parameters"`
 }
 
+type Button struct {
+	Text     string `json:"text"`
+	Postback string `json:"postback"`
+}
+
+type Card struct {
+	Title    string   `json:"title"`
+	Subtitle string   `json:"subtitle"`
+	ImageURI string   `json:"imageUri"`
+	Buttons  []Button `json:"buttons"`
+}
+
+type FulfillmentMessage struct {
+	Card Card `json:"card"`
+}
+
 type BotResponse struct {
-	FulfillmentText string `json:"fulfillmentText"`
+	FulfillmentText     string               `json:"fulfillmentText"`
+	FulfillmentMessages []FulfillmentMessage `json:"fulfillmentMessages"`
 }
 
 func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
