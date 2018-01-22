@@ -3,55 +3,106 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
-type BotRequest struct {
-	QueryResult QueryResult `json:"queryResult"`
+//APIAIRequest : Incoming request format from APIAI
+type APIAIRequest struct {
+	ID        string    `json:"id"`
+	Timestamp time.Time `json:"timestamp"`
+	Result    struct {
+		Parameters map[string]string `json:"parameters"`
+		Contexts   []interface{}     `json:"contexts"`
+		Metadata   struct {
+			IntentID                  string `json:"intentId"`
+			WebhookUsed               string `json:"webhookUsed"`
+			WebhookForSlotFillingUsed string `json:"webhookForSlotFillingUsed"`
+			IntentName                string `json:"intentName"`
+		} `json:"metadata"`
+		Score float32 `json:"score"`
+	} `json:"result"`
+	Status struct {
+		Code      int    `json:"code"`
+		ErrorType string `json:"errorType"`
+	} `json:"status"`
+	SessionID       string      `json:"sessionId"`
+	OriginalRequest interface{} `json:"originalRequest"`
 }
 
-type QueryResult struct {
-	Parameters map[string]string `json:"parameters"`
-}
-
-type Message struct {
-	Speech string `json:"speech"`
-	Type   int    `json:"type"`
-}
-
-type FulfillmentMessage struct {
-	//Card           Card             `json:"card"`
-	Messages []Message `json:"messages"`
-	//Text []string `json:"text"`
-}
-
-type BotResponse struct {
-	//FulfillmentText     string               `json:"fulfillmentText"`
-	//FulfillmentMessages []FulfillmentMessage `json:"fulfillmentMessages"`
-	Messages []Message `json:"messages"`
+//APIAIMessage : Response Message Structure
+type APIAIMessage struct {
+	Speech      string `json:"speech"`
+	DisplayText string `json:"displayText"`
+	Source      string `json:"source"`
 }
 
 func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	fmt.Println("Received body: ", request.Body)
-	var botRequest BotRequest
-	err := json.Unmarshal([]byte(request.Body), &botRequest)
-	if err != nil {
-		panic(err)
-	}
-	botResponse := &BotResponse{
-		Messages: []Message{
-			Message{
-				Speech: "speech",
-				Type:   0,
+	var t APIAIRequest
+	json.Unmarshal([]byte(request.Body), &t)
+
+	//msg := "{\"speech\": \"speech\", \"displayText\" : \"display\"}" //json.Marshal(APIAIMessage{Source: "Hotel Feedback System", Speech: "Thank you for the feedback", DisplayText: "Thank you for the feedback"})
+
+	msg := `
+	{
+		
+		"messages": [
+			{
+				"speech": "content to be read aloud",
+				"type": 0
 			},
-		},
+	
+	
+			{
+				"platform": "google",
+				"type": "simple_response",
+				"displayText": "top level text", 
+				"textToSpeech": "voice speech to be read out loud"  
+			},
+			{
+				"platform": "google",
+				"type": "basic_card",
+				"title": "title text",
+				"subtitle": "subtitle text",
+				"formattedText": "text with newlines and such",
+				"image": {
+					"url": "http://example.com/image.png",
+					"accessibilityText": "image descrition for screen readers"  
+				},
+				"buttons": [
+					{
+						"title": "Link title",
+						"openUrlAction": {
+							"url": "https://example.com/linkout.html"
+						}
+					}
+				]
+			},
+			{
+				"platform": "google",
+				"type": "suggestion_chips",
+				"suggestions": [
+					{
+						"title": "Next"
+					},
+					{
+						"title": "Previous"
+					},
+					{
+						"title": "Return to Results"
+					}
+				]
+			}
+		]
 	}
+		`
 
-	respBytes, _ := json.Marshal(&botResponse)
+	//respBytes, _ := json.Marshal(&botResponse)
 
-	return events.APIGatewayProxyResponse{Body: string(respBytes), StatusCode: 200}, nil
+	return events.APIGatewayProxyResponse{Body: msg, StatusCode: 200}, nil
 }
 
 func main() {
