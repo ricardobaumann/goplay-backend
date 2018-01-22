@@ -22,18 +22,25 @@ type Button struct {
 }
 
 type Card struct {
-	Title    string   `json:"title"`
-	Subtitle string   `json:"subtitle"`
-	ImageURI string   `json:"imageUri"`
-	Buttons  []Button `json:"buttons"`
+	Title    string `json:"title"`
+	Subtitle string `json:"subtitle"`
+	//ImageURI string   `json:"imageUri"`
+	Buttons []Button `json:"buttons"`
+}
+
+type SimpleResponse struct {
+	TextToSpeech string `json:"textToSpeech"`
+	DisplayText  string `json:"displayText"`
 }
 
 type FulfillmentMessage struct {
-	Card Card `json:"card"`
+	//Card           Card             `json:"card"`
+	SimpleResponse []SimpleResponse `json:"simpleResponses"`
+	//Text []string `json:"text"`
 }
 
 type BotResponse struct {
-	FulfillmentText     string               `json:"fulfillmentText"`
+	//FulfillmentText     string               `json:"fulfillmentText"`
 	FulfillmentMessages []FulfillmentMessage `json:"fulfillmentMessages"`
 }
 
@@ -44,7 +51,18 @@ func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	if err != nil {
 		panic(err)
 	}
-	botResponse := BotResponse{FulfillmentText: botRequest.QueryResult.Parameters["color"]}
+	botResponse := &BotResponse{
+
+		FulfillmentMessages: []FulfillmentMessage{
+			FulfillmentMessage{
+				SimpleResponse: []SimpleResponse{
+					SimpleResponse{
+						TextToSpeech: "text to speech",
+						DisplayText:  "display text",
+					},
+				},
+			}}}
+
 	respBytes, _ := json.Marshal(&botResponse)
 
 	return events.APIGatewayProxyResponse{Body: string(respBytes), StatusCode: 200}, nil
