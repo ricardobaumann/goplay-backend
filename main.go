@@ -16,32 +16,21 @@ type QueryResult struct {
 	Parameters map[string]string `json:"parameters"`
 }
 
-type Button struct {
-	Text     string `json:"text"`
-	Postback string `json:"postback"`
-}
-
-type Card struct {
-	Title    string `json:"title"`
-	Subtitle string `json:"subtitle"`
-	//ImageURI string   `json:"imageUri"`
-	Buttons []Button `json:"buttons"`
-}
-
-type SimpleResponse struct {
-	TextToSpeech string `json:"textToSpeech"`
-	DisplayText  string `json:"displayText"`
+type Message struct {
+	Speech string `json:"speech"`
+	Type   int    `json:"type"`
 }
 
 type FulfillmentMessage struct {
 	//Card           Card             `json:"card"`
-	SimpleResponse []SimpleResponse `json:"simpleResponses"`
+	Messages []Message `json:"messages"`
 	//Text []string `json:"text"`
 }
 
 type BotResponse struct {
 	//FulfillmentText     string               `json:"fulfillmentText"`
-	FulfillmentMessages []FulfillmentMessage `json:"fulfillmentMessages"`
+	//FulfillmentMessages []FulfillmentMessage `json:"fulfillmentMessages"`
+	Messages []Message `json:"messages"`
 }
 
 func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
@@ -52,16 +41,13 @@ func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 		panic(err)
 	}
 	botResponse := &BotResponse{
-
-		FulfillmentMessages: []FulfillmentMessage{
-			FulfillmentMessage{
-				SimpleResponse: []SimpleResponse{
-					SimpleResponse{
-						TextToSpeech: "text to speech",
-						DisplayText:  "display text",
-					},
-				},
-			}}}
+		Messages: []Message{
+			Message{
+				Speech: "speech",
+				Type:   0,
+			},
+		},
+	}
 
 	respBytes, _ := json.Marshal(&botResponse)
 
