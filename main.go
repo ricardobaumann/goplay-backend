@@ -1,52 +1,16 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"time"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
-//APIAIRequest : Incoming request format from APIAI
-type APIAIRequest struct {
-	ID        string    `json:"id"`
-	Timestamp time.Time `json:"timestamp"`
-	Result    struct {
-		Parameters map[string]string `json:"parameters"`
-		Contexts   []interface{}     `json:"contexts"`
-		Metadata   struct {
-			IntentID                  string `json:"intentId"`
-			WebhookUsed               string `json:"webhookUsed"`
-			WebhookForSlotFillingUsed string `json:"webhookForSlotFillingUsed"`
-			IntentName                string `json:"intentName"`
-		} `json:"metadata"`
-		Score float32 `json:"score"`
-	} `json:"result"`
-	Status struct {
-		Code      int    `json:"code"`
-		ErrorType string `json:"errorType"`
-	} `json:"status"`
-	SessionID       string      `json:"sessionId"`
-	OriginalRequest interface{} `json:"originalRequest"`
-}
-
-//APIAIMessage : Response Message Structure
-type APIAIMessage struct {
-	Speech      string `json:"speech"`
-	DisplayText string `json:"displayText"`
-	Source      string `json:"source"`
-}
-
 func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	fmt.Println("Received body: ", request.Body)
-	var t APIAIRequest
-	json.Unmarshal([]byte(request.Body), &t)
 
-	//msg := "{\"speech\": \"speech\", \"displayText\" : \"display\"}" //json.Marshal(APIAIMessage{Source: "Hotel Feedback System", Speech: "Thank you for the feedback", DisplayText: "Thank you for the feedback"})
-
-	msg := `
+	cardMsg := fmt.Sprintf(`
 	{
 		
 		"messages": [
@@ -65,9 +29,9 @@ func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 			{
 				"platform": "google",
 				"type": "basic_card",
-				"title": "title text",
-				"subtitle": "subtitle text",
-				"formattedText": "text with newlines and such",
+				"title": "%s
+				"subtitle": "%s",
+				"formattedText": "%s",
 				"image": {
 					"url": "http://example.com/image.png",
 					"accessibilityText": "image descrition for screen readers"  
@@ -80,29 +44,14 @@ func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 						}
 					}
 				]
-			},
-			{
-				"platform": "google",
-				"type": "suggestion_chips",
-				"suggestions": [
-					{
-						"title": "Next"
-					},
-					{
-						"title": "Previous"
-					},
-					{
-						"title": "Return to Results"
-					}
-				]
 			}
 		]
 	}
-		`
+		`, "title text", "subtitle text", "text with newlines and such")
 
 	//respBytes, _ := json.Marshal(&botResponse)
 
-	return events.APIGatewayProxyResponse{Body: msg, StatusCode: 200}, nil
+	return events.APIGatewayProxyResponse{Body: cardMsg, StatusCode: 200}, nil
 }
 
 func main() {
