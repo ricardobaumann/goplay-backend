@@ -10,13 +10,13 @@ This repository contains template for creating serverless services written in Go
 serverless create -u https://github.com/serverless/serverless-golang/ -p myservice
 ```
 
-2. Compile function
+2. Compile and test function
 
 ```
 cd myservice
-GOOS=linux go build -o bin/main
+GOOS=linux go build -o bin/main && sls deploy && curl -X POST https://80peqhwnuj.execute-api.eu-west-1.amazonaws.com/dev/echo -d '{"queryResult": {"parameters": {"color": "blue"}}}'
 ```
-
+s
 3. Deploy!
 
 ```
