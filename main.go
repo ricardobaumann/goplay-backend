@@ -49,9 +49,72 @@ func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	}
 		`, "title text", "subtitle text", "text with newlines and such")
 
+	println(cardMsg)
+
+	carouselMsg := `
+	{
+		"data": {
+			"google": {
+			  "expectUserResponse": false
+			}
+		  },
+		"messages": [
+			{
+				"speech": "content to be read aloud",
+				"type": 0
+			},
+	
+	
+			{
+				"platform": "google",
+				"type": "simple_response",
+				"displayText": "top level text", 
+				"textToSpeech": "voice speech to be read out loud"  
+			},
+			
+			{
+				"items": [
+				  {
+					"description": "Option One Description",
+					"image": {
+					  "url": "https://www.welt.de/img/kmpkt/mobile172212734/4592507717-ci102l-w120/woman-working-with-a-baby.jpg",
+					  "accessibilityText": "acessibility text for option one"
+					},
+					"optionInfo": {
+					  "key": "itemOne",
+					  "synonyms": [
+						"thing one",
+						"object one"
+					  ]
+					},
+					"title": "Option One Title"
+				  },
+				  {
+					"description": "Option Two Description",
+					"image": {
+					  "url": "https://www.welt.de/img/wirtschaft/mobile164536178/7232506147-ci102l-w120/Iona-Bresser-Mutter-von-6-Kinder-8.jpg",
+					  "accessibilityText": "acessibility text for option two"
+					},
+					"optionInfo": {
+					  "key": "itemTwo",
+					  "synonyms": [
+						"thing two",
+						"object two"
+					  ]
+					},
+					"title": "Option Two Title"
+				  }
+				],
+				"platform": "google",
+				"type": "carousel_card"
+			  }
+
+		]
+	}
+		`
 	//respBytes, _ := json.Marshal(&botResponse)
 
-	return events.APIGatewayProxyResponse{Body: cardMsg, StatusCode: 200}, nil
+	return events.APIGatewayProxyResponse{Body: carouselMsg, StatusCode: 200}, nil
 }
 
 func main() {
